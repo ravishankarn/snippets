@@ -1,9 +1,72 @@
-Paternity Leave Plan Notification
+const stateProvinceLookup: Record<string, { name: string; countryCode: string; countryName: string }> = {
+    // USA States
+    "AL": { name: "Alabama", countryCode: "US", countryName: "United States" },
+    "AK": { name: "Alaska", countryCode: "US", countryName: "United States" },
+    "AZ": { name: "Arizona", countryCode: "US", countryName: "United States" },
+    "AR": { name: "Arkansas", countryCode: "US", countryName: "United States" },
+    "CA": { name: "California", countryCode: "US", countryName: "United States" },
+    "CO": { name: "Colorado", countryCode: "US", countryName: "United States" },
+    "CT": { name: "Connecticut", countryCode: "US", countryName: "United States" },
+    "DE": { name: "Delaware", countryCode: "US", countryName: "United States" },
+    "FL": { name: "Florida", countryCode: "US", countryName: "United States" },
+    "GA": { name: "Georgia", countryCode: "US", countryName: "United States" },
+    "HI": { name: "Hawaii", countryCode: "US", countryName: "United States" },
+    "ID": { name: "Idaho", countryCode: "US", countryName: "United States" },
+    "IL": { name: "Illinois", countryCode: "US", countryName: "United States" },
+    "IN": { name: "Indiana", countryCode: "US", countryName: "United States" },
+    "IA": { name: "Iowa", countryCode: "US", countryName: "United States" },
+    "KS": { name: "Kansas", countryCode: "US", countryName: "United States" },
+    "KY": { name: "Kentucky", countryCode: "US", countryName: "United States" },
+    "LA": { name: "Louisiana", countryCode: "US", countryName: "United States" },
+    "ME": { name: "Maine", countryCode: "US", countryName: "United States" },
+    "MD": { name: "Maryland", countryCode: "US", countryName: "United States" },
+    "MA": { name: "Massachusetts", countryCode: "US", countryName: "United States" },
+    "MI": { name: "Michigan", countryCode: "US", countryName: "United States" },
+    "MN": { name: "Minnesota", countryCode: "US", countryName: "United States" },
+    "MS": { name: "Mississippi", countryCode: "US", countryName: "United States" },
+    "MO": { name: "Missouri", countryCode: "US", countryName: "United States" },
+    "MT": { name: "Montana", countryCode: "US", countryName: "United States" },
+    "NE": { name: "Nebraska", countryCode: "US", countryName: "United States" },
+    "NV": { name: "Nevada", countryCode: "US", countryName: "United States" },
+    "NH": { name: "New Hampshire", countryCode: "US", countryName: "United States" },
+    "NJ": { name: "New Jersey", countryCode: "US", countryName: "United States" },
+    "NM": { name: "New Mexico", countryCode: "US", countryName: "United States" },
+    "NY": { name: "New York", countryCode: "US", countryName: "United States" },
+    "NC": { name: "North Carolina", countryCode: "US", countryName: "United States" },
+    "ND": { name: "North Dakota", countryCode: "US", countryName: "United States" },
+    "OH": { name: "Ohio", countryCode: "US", countryName: "United States" },
+    "OK": { name: "Oklahoma", countryCode: "US", countryName: "United States" },
+    "OR": { name: "Oregon", countryCode: "US", countryName: "United States" },
+    "PA": { name: "Pennsylvania", countryCode: "US", countryName: "United States" },
+    "RI": { name: "Rhode Island", countryCode: "US", countryName: "United States" },
+    "SC": { name: "South Carolina", countryCode: "US", countryName: "United States" },
+    "SD": { name: "South Dakota", countryCode: "US", countryName: "United States" },
+    "TN": { name: "Tennessee", countryCode: "US", countryName: "United States" },
+    "TX": { name: "Texas", countryCode: "US", countryName: "United States" },
+    "UT": { name: "Utah", countryCode: "US", countryName: "United States" },
+    "VT": { name: "Vermont", countryCode: "US", countryName: "United States" },
+    "VA": { name: "Virginia", countryCode: "US", countryName: "United States" },
+    "WA": { name: "Washington", countryCode: "US", countryName: "United States" },
+    "WV": { name: "West Virginia", countryCode: "US", countryName: "United States" },
+    "WI": { name: "Wisconsin", countryCode: "US", countryName: "United States" },
+    "WY": { name: "Wyoming", countryCode: "US", countryName: "United States" },
+    
+    // Canadian Provinces
+    "AB": { name: "Alberta", countryCode: "CA", countryName: "Canada" },
+    "BC": { name: "British Columbia", countryCode: "CA", countryName: "Canada" },
+    "MB": { name: "Manitoba", countryCode: "CA", countryName: "Canada" },
+    "NB": { name: "New Brunswick", countryCode: "CA", countryName: "Canada" },
+    "NL": { name: "Newfoundland and Labrador", countryCode: "CA", countryName: "Canada" },
+    "NS": { name: "Nova Scotia", countryCode: "CA", countryName: "Canada" },
+    "NT": { name: "Northwest Territories", countryCode: "CA", countryName: "Canada" },
+    "NU": { name: "Nunavut", countryCode: "CA", countryName: "Canada" },
+    "ON": { name: "Ontario", countryCode: "CA", countryName: "Canada" },
+    "PE": { name: "Prince Edward Island", countryCode: "CA", countryName: "Canada" },
+    "QC": { name: "Quebec", countryCode: "CA", countryName: "Canada" },
+    "SK": { name: "Saskatchewan", countryCode: "CA", countryName: "Canada" },
+    "YT": { name: "Yukon", countryCode: "CA", countryName: "Canada" }
+};
 
-Hi Ben
-
-I hope this message finds you well. Following up on our recent conversation during Bi-Weekly connect, I wanted to formally share that my wife and I are expecting the arrival of our child on March, 18th. As discussed, I will be taking 4 weeks of paternity leave starting from the delivery date to support my family during this exciting time.
-
-To ensure seamless continuity of work, I will coordinate closely with team to transition responsibilities and provide the necessary handovers before my leave.
-
-I’ll keep you updated as the date approaches and appreciate your understanding and support as I take this time to focus on my growing family. Please don’t hesitate to reach out if you have any questions or need further details.
+function getStateDetails(code: string) {
+    return stateProvinceLookup[code.toUpperCase()] || null;
+}
