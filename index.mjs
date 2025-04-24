@@ -134,4 +134,48 @@ export const handlerReturn = awslambda.streamifyResponse(
   }
 );
 
-// You can configure API Gateway to route to one of the four handler variants above.
+// --- Option 5: Using returned response body stream ---
+export const handlerReturnBody = awslambda.streamifyResponse(
+  async (event, responseStream, context) => {
+    console.log("[ReturnBody] Event received", event);
+    const url = event.queryStringParameters?.url || PRESIGNED_URL;
+
+    if (!url) {
+      console.log("[ReturnBody] Missing URL param");
+      responseStream.writeHead?.(400, { 'Content-Type': 'text/plain' });
+      responseStream.end('Missing "url" query parameter');
+      return;
+    }
+
+    const fileName = url.split('/').pop().split('?')[0] || 'download.bin';
+    console.log("[ReturnBody] Preparing to stream file:", fileName);
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+      },
+      body: async (stream) => {
+        return new Promise((resolve, reject) => {
+          https.get(url, (s3Res) => {
+            s3Res.pipe(stream);
+            s3Res.on('end', () => {
+              console.log('[ReturnBody] Stream ended');
+              resolve();
+            });
+            s3Res.on('error', (err) => {
+              console.error('[ReturnBody] Stream error:', err);
+              reject(err);
+            });
+          }).on('error', (err) => {
+            console.error('[ReturnBody] Request error:', err);
+            reject(err);
+          });
+        });
+      },
+    };
+  }
+);
+
+// You can configure API Gateway to route to one of the five handler variants above.
