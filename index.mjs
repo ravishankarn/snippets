@@ -1,34 +1,137 @@
-// index.mjs
+// === Lambda Function Code (Node.js 20+) ===
+// File: index.mjs
 import https from 'https';
 
-export const handler = awslambda.streamifyResponse(async (event, responseStream, context) => {
-  try {
-    const presignedUrl = event.queryStringParameters?.url;
-    if (!presignedUrl) {
-      responseStream.writeHead(400, { 'Content-Type': 'text/plain' });
+// Presigned URL for local testing
+const PRESIGNED_URL = 'https://your-bucket.s3.amazonaws.com/your-large-file.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=...';
+
+// --- Option 1: Using setHeader ---
+export const handlerSetHeader = awslambda.streamifyResponse(
+  async (event, responseStream, context) => {
+    console.log("[SetHeader] Event received", event);
+    const url = event.queryStringParameters?.url || PRESIGNED_URL;
+
+    if (!url) {
+      console.log("[SetHeader] Missing URL param");
+      responseStream.setHeader?.('Content-Type', 'text/plain');
       responseStream.end('Missing "url" query parameter');
       return;
     }
 
-    https.get(presignedUrl, (s3Res) => {
-      if (s3Res.statusCode !== 200) {
-        responseStream.writeHead(s3Res.statusCode, s3Res.headers);
-        s3Res.pipe(responseStream);
-        return;
-      }
+    const fileName = url.split('/').pop().split('?')[0] || 'download.bin';
+    console.log("[SetHeader] Streaming file:", fileName);
+    responseStream.setHeader?.('Content-Type', 'application/octet-stream');
+    responseStream.setHeader?.('Content-Disposition', `attachment; filename="${fileName}"`);
 
-      responseStream.writeHead(200, {
-        'Content-Type': s3Res.headers['content-type'] || 'application/octet-stream',
-        'Content-Disposition': 'attachment; filename="downloaded-file"',
-      });
-
+    https.get(url, (s3Res) => {
       s3Res.pipe(responseStream);
+      s3Res.on('end', () => console.log('[SetHeader] Stream ended'));
+      s3Res.on('error', (err) => {
+        console.error('[SetHeader] Stream error:', err);
+        responseStream.end();
+      });
     }).on('error', (err) => {
-      responseStream.writeHead(500, { 'Content-Type': 'text/plain' });
-      responseStream.end('Error fetching from S3: ' + err.message);
+      console.error('[SetHeader] Request error:', err);
+      responseStream.end();
     });
-  } catch (err) {
-    responseStream.writeHead(500, { 'Content-Type': 'text/plain' });
-    responseStream.end('Internal server error: ' + err.message);
   }
-});
+);
+
+// --- Option 2: Using writeHead ---
+export const handlerWriteHead = awslambda.streamifyResponse(
+  async (event, responseStream, context) => {
+    console.log("[WriteHead] Event received", event);
+    const url = event.queryStringParameters?.url || PRESIGNED_URL;
+
+    if (!url) {
+      console.log("[WriteHead] Missing URL param");
+      responseStream.writeHead?.(400, { 'Content-Type': 'text/plain' });
+      responseStream.end('Missing "url" query parameter');
+      return;
+    }
+
+    const fileName = url.split('/').pop().split('?')[0] || 'download.bin';
+    console.log("[WriteHead] Streaming file:", fileName);
+    responseStream.writeHead?.(200, {
+      'Content-Type': 'application/octet-stream',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+
+    https.get(url, (s3Res) => {
+      s3Res.pipe(responseStream);
+      s3Res.on('end', () => console.log('[WriteHead] Stream ended'));
+      s3Res.on('error', (err) => {
+        console.error('[WriteHead] Stream error:', err);
+        responseStream.end();
+      });
+    }).on('error', (err) => {
+      console.error('[WriteHead] Request error:', err);
+      responseStream.end();
+    });
+  }
+);
+
+// --- Option 3: Using write ---
+export const handlerWrite = awslambda.streamifyResponse(
+  async (event, responseStream, context) => {
+    console.log("[Write] Event received", event);
+    const url = event.queryStringParameters?.url || PRESIGNED_URL;
+
+    if (!url) {
+      console.log("[Write] Missing URL param");
+      responseStream.write('Missing "url" query parameter');
+      responseStream.end();
+      return;
+    }
+
+    const fileName = url.split('/').pop().split('?')[0] || 'download.bin';
+    console.log("[Write] Starting stream for:", fileName);
+
+    https.get(url, (s3Res) => {
+      responseStream.write(`Downloading file: ${fileName}\n`);
+      s3Res.pipe(responseStream);
+      s3Res.on('end', () => console.log('[Write] Stream ended'));
+      s3Res.on('error', (err) => {
+        console.error('[Write] Stream error:', err);
+        responseStream.end();
+      });
+    }).on('error', (err) => {
+      console.error('[Write] Request error:', err);
+      responseStream.end();
+    });
+  }
+);
+
+// --- Option 4: Using return only ---
+export const handlerReturn = awslambda.streamifyResponse(
+  async (event, responseStream, context) => {
+    console.log("[ReturnOnly] Event received", event);
+    const url = event.queryStringParameters?.url || PRESIGNED_URL;
+
+    if (!url) {
+      console.log("[ReturnOnly] Missing URL param");
+      return responseStream.end('Missing "url" query parameter');
+    }
+
+    const fileName = url.split('/').pop().split('?')[0] || 'download.bin';
+    console.log("[ReturnOnly] Streaming file:", fileName);
+
+    https.get(url, (s3Res) => {
+      responseStream.writeHead?.(200, {
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+      });
+      s3Res.pipe(responseStream);
+      s3Res.on('end', () => console.log('[ReturnOnly] Stream ended'));
+      s3Res.on('error', (err) => {
+        console.error('[ReturnOnly] Stream error:', err);
+        responseStream.end();
+      });
+    }).on('error', (err) => {
+      console.error('[ReturnOnly] Request error:', err);
+      responseStream.end();
+    });
+  }
+);
+
+// You can configure API Gateway to route to one of the four handler variants above.
