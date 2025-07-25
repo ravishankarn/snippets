@@ -1,0 +1,163 @@
+As a Scrum Master guiding development using JIRA, the best practice is to capture high-level functional goals and cross-cutting concerns in the Epic, and break them down into User Stories for each screen and its specific workflow, fields, and validations.
+
+
+---
+
+✅ Best Practice Summary
+
+Item	Epic Level	User Story Level
+
+Scope	High-level application feature	Specific screen/interaction
+Purpose	Organize related work	Define work that can be completed in a sprint
+Captures	Purpose of screens, user flows	Detailed fields, validations, UI behavior, acceptance criteria
+Who writes	Product Owner, Business Analyst	Team collaboratively, refined in grooming
+JIRA Usage	Epic ticket (with child stories)	Linked to epic, one per screen or sub-feature
+
+
+
+---
+
+🎯 Sample Scenario
+
+Let's say your app is a simple Job Application Portal with the following screens:
+
+1. Applicant Info Screen
+
+
+2. Resume Upload Screen
+
+
+3. Application Summary & Submit Screen
+
+
+
+
+---
+
+🧱 Epic Example (JIRA Ticket: APP-1)
+
+Title: Develop Job Application Workflow
+Description:
+
+> As a job seeker, I want to complete a 3-step application process so that I can submit my profile to job openings.
+
+This feature includes:
+
+Collecting applicant information
+
+Uploading resume
+
+Reviewing and submitting the application
+
+
+Each screen will have its own validations and UI behavior.
+
+
+
+Acceptance Criteria:
+
+End-to-end flow from start to submit
+
+Consistent UI/UX
+
+Proper error handling and field validations
+
+Saved progress between screens
+
+
+Child Stories:
+
+APP-2: Build Applicant Info Screen
+
+APP-3: Build Resume Upload Screen
+
+APP-4: Build Submit Screen
+
+
+
+---
+
+📄 User Story Example (JIRA Ticket: APP-2)
+
+Title: Build Applicant Info Screen
+Description:
+
+> As a user, I want to enter my personal information (name, email, phone, address) so that I can proceed with the application process.
+
+
+
+Fields:
+
+Name (Required, text)
+
+Email (Required, must be valid format)
+
+Phone (Optional, numeric only)
+
+Address (Optional, multiline)
+
+
+Validations:
+
+Required fields must be filled
+
+Email must be in valid format
+
+Highlight errors in real-time
+
+
+Acceptance Criteria:
+
+1. Fields are displayed as per mockups
+
+
+2. Validation fires on submit and on blur
+
+
+3. Error messages match UX spec
+
+
+4. Clicking “Next” takes user to Resume Upload Screen
+
+
+
+Attachments:
+
+UI mockup (optional)
+
+JSON Schema (if available)
+
+API spec (if needed)
+
+
+
+---
+
+🔁 Process Recommendations
+
+Backlog Grooming: During refinement, fill in story details including validations and attach relevant UI mockups or API specs.
+
+Definition of Ready (DoR): Each story should clearly define the fields, validations, and navigation.
+
+Definition of Done (DoD): Screens function independently, pass QA, and integrate into the main app flow.
+
+
+
+---
+
+📌 Tips
+
+Use JIRA's Epic link feature to tie stories to their Epic.
+
+Consider using Story templates in JIRA to standardize field/validation description.
+
+If there are shared validations (e.g., email validation across screens), consider logging a technical task or sub-task linked to multiple stories.
+
+For complex workflows, consider including flowcharts or diagrams in the Epic for clarity.
+
+
+
+---
+
+Would you like a sample JIRA ticket template (Markdown or JIRA format) for copy-pasting?
+
